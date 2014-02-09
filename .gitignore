@@ -1,0 +1,5 @@
+.ropeproject
+.virtualenv
+__pycache__
+*.pyc
+*.bak
