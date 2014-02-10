@@ -1,6 +1,9 @@
-from django.http import HttpResponse
+""" list view controller. """
+
 from django.shortcuts import render
 
-# Create your views here.
+
 def home_page(request):
-    return HttpResponse('<html><title>To-Do lists</title></html>')
+    """ Render home page HTML. """
+
+    return render(request, 'home.html')
