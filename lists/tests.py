@@ -17,11 +17,29 @@ class HomePageTest(TestCase):
         found = resolve('/')
         self.assertEqual(found.func, home_page)
 
-    def test_home_page_retuens_correct_html(self):
+    def test_home_page_returns_correct_html(self):
         """ Check for home page content. """
 
         request = HttpRequest()
         response = home_page(request)
         expected_html = render_to_string('home.html')
+
+        self.assertEqual(response.content.decode(), expected_html)
+
+    def test_home_page_can_save_a_POST_request(self):
+        """
+        Check if home page can handle the submitted data via HTTP POST.
+
+        """
+
+        item_text = 'A new list item'
+        expected_html = render_to_string('home.html',
+                                         {'new_item_text': item_text})
+
+        request = HttpRequest()
+        request.method = 'POST'
+        request.POST['item_text'] = item_text
+
+        response = home_page(request)
 
         self.assertEqual(response.content.decode(), expected_html)
