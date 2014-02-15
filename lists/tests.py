@@ -34,8 +34,25 @@ class HomePageTest(TestCase):
         """
 
         item_text = 'A new list item'
-        expected_html = render_to_string('home.html',
-                                         {'new_item_text': item_text})
+
+        request = HttpRequest()
+        request.method = 'POST'
+        request.POST['item_text'] = item_text
+
+        home_page(request)
+
+        self.assertEqual(Item.objects.count(), 1)
+
+        new_item = Item.objects.first()
+        self.assertEqual(new_item.text, item_text)
+
+    def test_home_page_redirects_after_POST(self):
+        """
+        Check if home page redirect after handling the HTTP POST request
+
+        """
+
+        item_text = 'A new list item'
 
         request = HttpRequest()
         request.method = 'POST'
@@ -43,7 +60,36 @@ class HomePageTest(TestCase):
 
         response = home_page(request)
 
-        self.assertEqual(response.content.decode(), expected_html)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['location'], '/')
+
+    def test_home_page_only_saves_items_when_necessary(self):
+        """
+        Make sure a normal visit to the home page doesn't create a new item.
+
+        """
+
+        request = HttpRequest()
+        home_page(request)
+
+        self.assertEqual(Item.objects.count(), 0)
+
+    def test_home_page_displays_all_list_items(self):
+        """
+        Make sure the list table on home page display all the items
+
+        """
+
+        check_items = ['Item 1', 'Item 2', 'Another item']
+
+        for item in check_items:
+            Item.objects.create(text=item)
+
+        request = HttpRequest()
+        response = home_page(request)
+
+        for item in check_items:
+            self.assertIn(item, response.content.decode())
 
 
 class ItemModelTest(TestCase):
