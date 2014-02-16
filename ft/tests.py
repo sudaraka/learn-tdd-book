@@ -1,20 +1,22 @@
-#!/usr/bin/env python
 """ Functional test for TDD Book. """
 
+from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
-import unittest
 
-
-class NewUserTest(unittest.TestCase):
+class NewUserTest(LiveServerTestCase):
     """ Test user experience on first visit to the site. """
 
     def setUp(self):
+        """ Initialize environment for each test """
+
         self.browser = webdriver.Firefox()
         self.browser.implicitly_wait(3)
 
     def tearDown(self):
+        """ Cleanup environment of each test """
+
         self.browser.quit()
 
     def test_can_start_a_list_and_retrive_it_later(self):
@@ -25,7 +27,7 @@ class NewUserTest(unittest.TestCase):
 
         # Edith has heard about a cool new online to-do app. She goes to
         # checkout its home page.
-        self.browser.get('http://localhost:8000/')
+        self.browser.get(self.live_server_url)
 
         # She notice the page title and header mention to-do lists.
         self.assertIn('To-Do', self.browser.title)
@@ -78,7 +80,3 @@ class NewUserTest(unittest.TestCase):
         table = self.browser.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
         self.assertIn(row_text, [row.text for row in rows])
-
-
-if '__main__' == __name__:
-    unittest.main(warnings='ignore')
