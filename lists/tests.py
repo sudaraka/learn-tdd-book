@@ -27,54 +27,6 @@ class HomePageTest(TestCase):
 
         self.assertEqual(response.content.decode(), expected_html)
 
-    def test_home_page_can_save_a_POST_request(self):
-        """
-        Check if home page can handle the submitted data via HTTP POST.
-
-        """
-
-        item_text = 'A new list item'
-
-        request = HttpRequest()
-        request.method = 'POST'
-        request.POST['item_text'] = item_text
-
-        home_page(request)
-
-        self.assertEqual(Item.objects.count(), 1)
-
-        new_item = Item.objects.first()
-        self.assertEqual(new_item.text, item_text)
-
-    def test_home_page_redirects_after_POST(self):
-        """
-        Check if home page redirect after handling the HTTP POST request
-
-        """
-
-        item_text = 'A new list item'
-
-        request = HttpRequest()
-        request.method = 'POST'
-        request.POST['item_text'] = item_text
-
-        response = home_page(request)
-
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'],
-                         '/lists/the-only-list-in-the-world/')
-
-    def test_home_page_only_saves_items_when_necessary(self):
-        """
-        Make sure a normal visit to the home page doesn't create a new item.
-
-        """
-
-        request = HttpRequest()
-        home_page(request)
-
-        self.assertEqual(Item.objects.count(), 0)
-
 
 class ItemModelTest(TestCase):
     """ Test Item model related operations """
@@ -121,3 +73,36 @@ class ListViewTest(TestCase):
 
         for item in check_items:
             self.assertContains(response, item)
+
+
+class NewListTest(TestCase):
+    """ Test functionality of creating a new list """
+
+    def test_saving_a_POST_request(self):
+        """
+        Check if we can handle the submitted data via HTTP POST.
+
+        """
+
+        item_text = 'A new list item'
+
+        self.client.post('/lists/new', data={'item_text': item_text})
+
+        self.assertEqual(Item.objects.count(), 1)
+
+        new_item = Item.objects.first()
+        self.assertEqual(new_item.text, item_text)
+
+    def test_redirects_after_POST(self):
+        """
+        Check if it redirect after handling the HTTP POST request
+
+        """
+
+        item_text = 'A new list item'
+
+        response = self.client.post('/lists/new',
+                                    data={'item_text': item_text})
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/lists/the-only-list-in-the-world/')
