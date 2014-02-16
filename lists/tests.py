@@ -61,7 +61,8 @@ class HomePageTest(TestCase):
         response = home_page(request)
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], '/')
+        self.assertEqual(response['location'],
+                         '/lists/the-only-list-in-the-world/')
 
     def test_home_page_only_saves_items_when_necessary(self):
         """
@@ -73,23 +74,6 @@ class HomePageTest(TestCase):
         home_page(request)
 
         self.assertEqual(Item.objects.count(), 0)
-
-    def test_home_page_displays_all_list_items(self):
-        """
-        Make sure the list table on home page display all the items
-
-        """
-
-        check_items = ['Item 1', 'Item 2', 'Another item']
-
-        for item in check_items:
-            Item.objects.create(text=item)
-
-        request = HttpRequest()
-        response = home_page(request)
-
-        for item in check_items:
-            self.assertIn(item, response.content.decode())
 
 
 class ItemModelTest(TestCase):
@@ -110,3 +94,30 @@ class ItemModelTest(TestCase):
         self.assertEqual(saved_items.count(), 2)
         self.assertEqual(saved_items[0].text, first_item.text)
         self.assertEqual(saved_items[1].text, second_item.text)
+
+
+class ListViewTest(TestCase):
+    """ List view UI (url, view, template) test """
+
+    def test_used_list_template(self):
+        """ Test if list is rendered using correct template list.html """
+
+        response = self.client.get('/lists/the-only-list-in-the-world/')
+
+        self.assertTemplateUsed(response, 'list.html')
+
+    def test_displays_all_list_items(self):
+        """
+        Make sure the list table on home page display all the items
+
+        """
+
+        check_items = ['Item 1', 'Item 2', 'Another item']
+
+        for item in check_items:
+            Item.objects.create(text=item)
+
+        response = self.client.get('/lists/the-only-list-in-the-world/')
+
+        for item in check_items:
+            self.assertContains(response, item)

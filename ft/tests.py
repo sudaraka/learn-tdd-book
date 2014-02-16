@@ -76,8 +76,8 @@ class NewUserTest(LiveServerTestCase):
         self.browser.get(self.live_server_url)
         page_text = self.browser.find_element_by_tag_name('body').text
 
-        self.assertNotin('Buy peacock feathers', page_text)
-        self.assertNotin('make a fly', page_text)
+        self.assertNotIn('Buy peacock feathers', page_text)
+        self.assertNotIn('make a fly', page_text)
 
         # Francis starts a new list by entering a new item. He is less
         # interesting then Edith...
@@ -88,12 +88,12 @@ class NewUserTest(LiveServerTestCase):
         # Francis gets his own unique URL.
         francis_list_url = self.browser.current_url
         self.assertRegex(francis_list_url, '/lists/.+')
-        self.assetNotEqual(francis_list_url, edith_list_url)
+        self.assertNotEqual(francis_list_url, edith_list_url)
 
         # Again, there no trace of Edith's list
         page_text = self.browser.find_element_by_tag_name('body').text
 
-        self.assertNotin('Buy peacock feathers', page_text)
+        self.assertNotIn('Buy peacock feathers', page_text)
         self.assertIn('Buy milk', page_text)
 
         # Satisfied, they both goes back to sleep
