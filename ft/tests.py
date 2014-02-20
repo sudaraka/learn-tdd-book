@@ -19,7 +19,7 @@ class NewUserTest(LiveServerTestCase):
 
         self.browser.quit()
 
-    def test_can_start_a_list_and_retrive_it_later(self):
+    def xtest_can_start_a_list_and_retrive_it_later(self):
         """
         Test user behaviour of visiting the homepage and entering new to-do
         items.
@@ -98,6 +98,27 @@ class NewUserTest(LiveServerTestCase):
 
         # Satisfied, they both goes back to sleep
         #
+
+    def test_layout_and_style(self):
+        """ Test to ensure we have the basic layout and style """
+
+        # Edith goes to the home page
+        self.browser.get(self.live_server_url)
+        #self.browser.set_window_size(1024, 768)
+        viewport = self.browser.get_window_size()
+
+        # She notice the input box is nicely centered
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        self.assertAlmostEqual(
+            inputbox.location['x'] + inputbox.size['width'] / 2,
+            viewport['width'] / 2, delta=5)
+
+        # She starts a new list and sees the input is nicely centered there too
+        inputbox.send_keys('testing\n')
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        self.assertAlmostEqual(
+            inputbox.location['x'] + inputbox.size['width'] / 2,
+            viewport['width'] / 2, delta=5)
 
     def check_for_row_in_list_table(self, row_text):
         """ Check if given text exists in the listing table """
