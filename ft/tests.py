@@ -19,7 +19,7 @@ class NewUserTest(LiveServerTestCase):
 
         self.browser.quit()
 
-    def xtest_can_start_a_list_and_retrive_it_later(self):
+    def test_can_start_a_list_and_retrive_it_later(self):
         """
         Test user behaviour of visiting the homepage and entering new to-do
         items.
