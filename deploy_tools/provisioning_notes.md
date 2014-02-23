@@ -30,7 +30,7 @@ eg, on Ubuntu:
 
 Assume we have a user account at /home/USER
 
-    /homeUSER/
+    /home/USER/
     +-- sites
         +-- SITENAME
             +-- data
