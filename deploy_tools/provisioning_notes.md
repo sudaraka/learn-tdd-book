@@ -30,10 +30,10 @@ eg, on Ubuntu:
 
 Assume we have a user account at /home/USER
 
-/homeUSER/
-+-- sites
-    +-- SITENAME
-        +-- data
-        +-- source
-        +-- static
-        +-- virtualenv
+    /homeUSER/
+    +-- sites
+        +-- SITENAME
+            +-- data
+            +-- source
+            +-- static
+            +-- virtualenv
