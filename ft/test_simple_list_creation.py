@@ -1,45 +1,13 @@
 """ Functional test for TDD Book. """
 
-import sys
-
-from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
+from .base import BaseFunctionalTest
 
-class NewUserTest(LiveServerTestCase):
+
+class NewUserTest(BaseFunctionalTest):
     """ Test user experience on first visit to the site. """
-
-    @classmethod
-    def setUpClass(cls):
-        """ Initialize test/live servers """
-
-        for arg in sys.argv:
-            if 'liveserver' in arg:
-                cls.server_url = 'http://' + arg.split('=')[1]
-
-                return
-
-        LiveServerTestCase.setUpClass()
-        cls.server_url = cls.live_server_url
-
-    @classmethod
-    def tearDownClass(cls):
-        """ Cleanup global test/live test environment """
-
-        if cls.server_url == cls.live_server_url:
-            LiveServerTestCase.tearDownClass()
-
-    def setUp(self):
-        """ Initialize environment for each test """
-
-        self.browser = webdriver.Firefox()
-        self.browser.implicitly_wait(3)
-
-    def tearDown(self):
-        """ Cleanup environment of each test """
-
-        self.browser.quit()
 
     def test_can_start_a_list_and_retrive_it_later(self):
         """
@@ -119,32 +87,3 @@ class NewUserTest(LiveServerTestCase):
         self.assertIn('Buy milk', page_text)
 
         # Satisfied, they both goes back to sleep
-        #
-
-    def test_layout_and_style(self):
-        """ Test to ensure we have the basic layout and style """
-
-        # Edith goes to the home page
-        self.browser.get(self.server_url)
-        #self.browser.set_window_size(1024, 768)
-        viewport = self.browser.get_window_size()
-
-        # She notice the input box is nicely centered
-        inputbox = self.browser.find_element_by_id('id_new_item')
-        self.assertAlmostEqual(
-            inputbox.location['x'] + inputbox.size['width'] / 2,
-            viewport['width'] / 2, delta=5)
-
-        # She starts a new list and sees the input is nicely centered there too
-        inputbox.send_keys('testing\n')
-        inputbox = self.browser.find_element_by_id('id_new_item')
-        self.assertAlmostEqual(
-            inputbox.location['x'] + inputbox.size['width'] / 2,
-            viewport['width'] / 2, delta=5)
-
-    def check_for_row_in_list_table(self, row_text):
-        """ Check if given text exists in the listing table """
-
-        table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_tag_name('tr')
-        self.assertIn(row_text, [row.text for row in rows])
