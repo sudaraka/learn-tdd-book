@@ -73,6 +73,38 @@ class ListViewTest(TestCase):
         self.assertEqual(response.context['list'], correct_list)
         self.assertNotEqual(response.context['list'], other_list)
 
+    def test_can_save_a_POST_reqest_to_an_existing_list(self):
+        """ add and item to existing list """
+
+        item_text = 'A new item for an existing list'
+
+        correct_list = List.objects.create()
+        other_list = List.objects.create()
+
+        self.client.post('/lists/%d/' % correct_list.id,
+                         data={'item_text': item_text})
+
+        self.assertEqual(Item.objects.count(), 1)
+
+        new_item = Item.objects.first()
+
+        self.assertEqual(new_item.text, item_text)
+        self.assertEqual(new_item.list, correct_list)
+        self.assertNotEqual(new_item.list, other_list)
+
+    def test_POST_redirects_to_list_view(self):
+        """ add and item to existing list """
+
+        item_text = 'A new item for an existing list'
+
+        correct_list = List.objects.create()
+        List.objects.create()
+
+        response = self.client.post('/lists/%d/' % correct_list.id,
+                                    data={'item_text': item_text})
+
+        self.assertRedirects(response, '/lists/%d/' % correct_list.id)
+
 
 class NewListTest(TestCase):
     """ Test functionality of creating a new list """
@@ -126,39 +158,3 @@ class NewListTest(TestCase):
 
         self.assertEqual(List.objects.count(), 0)
         self.assertEqual(Item.objects.count(), 0)
-
-
-class NewItemTest(TestCase):
-    """ Test adding new items to lists """
-
-    def test_can_save_a_POST_reqest_to_an_existing_list(self):
-        """ add and item to existing list """
-
-        item_text = 'A new item for an existing list'
-
-        correct_list = List.objects.create()
-        other_list = List.objects.create()
-
-        self.client.post('/lists/%d/new_item' % correct_list.id,
-                         data={'item_text': item_text})
-
-        self.assertEqual(Item.objects.count(), 1)
-
-        new_item = Item.objects.first()
-
-        self.assertEqual(new_item.text, item_text)
-        self.assertEqual(new_item.list, correct_list)
-        self.assertNotEqual(new_item.list, other_list)
-
-    def test_redirects_to_list_view(self):
-        """ add and item to existing list """
-
-        item_text = 'A new item for an existing list'
-
-        correct_list = List.objects.create()
-        List.objects.create()
-
-        response = self.client.post('/lists/%d/new_item' % correct_list.id,
-                                    data={'item_text': item_text})
-
-        self.assertRedirects(response, '/lists/%d/' % correct_list.id)
