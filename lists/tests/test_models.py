@@ -6,31 +6,25 @@ from django.core.exceptions import ValidationError
 from lists.models import Item, List
 
 
-class ListAndItemModelTest(TestCase):
+class ItemModelTest(TestCase):
     """ Test Item model related operations """
+
+    def test_default_text(self):
+        """ Test item's default text value """
+
+        item = Item()
+        self.assertEqual(item.text, '')
 
     def test_saving_and_retrieving_items(self):
         """ Test saving and retrieving items """
 
-        list_ = List()
-        list_.save()
+        list_ = List.objects.create()
 
-        first_item = Item()
-        first_item.text = 'First (ever) list item'
-        first_item.list = list_
-        first_item.save()
+        item = Item()
+        item.list = list_
+        item.save()
 
-        second_item = Item()
-        second_item.text = 'Item the second'
-        second_item.list = list_
-        second_item.save()
-
-        saved_items = Item.objects.all()
-        self.assertEqual(saved_items.count(), 2)
-        self.assertEqual(saved_items[0].text, first_item.text)
-        self.assertEqual(saved_items[0].list, list_)
-        self.assertEqual(saved_items[1].text, second_item.text)
-        self.assertEqual(saved_items[1].list, list_)
+        self.assertIn(item, list_.item_set.all())
 
     def test_cannot_save_empty_list_items(self):
         """ test as the name suggest """
@@ -41,12 +35,6 @@ class ListAndItemModelTest(TestCase):
         with self.assertRaises(ValidationError):
             item.save()
             item.full_clean()
-
-    def test_get_absolute_url(self):
-        """ test as the name suggest """
-
-        list_ = List.objects.create()
-        self.assertEqual(list_.get_absolute_url(), '/lists/%d/' % list_.id)
 
     def test_duplicate_items_are_invalid(self):
         """
@@ -60,6 +48,7 @@ class ListAndItemModelTest(TestCase):
         with self.assertRaises(ValidationError):
             item = Item(text='SAME', list=list_)
             item.full_clean()
+            #item.save()
 
     def test_can_save_same_item_in_different_lists(self):
         """ test as the name suggests """
@@ -85,3 +74,13 @@ class ListAndItemModelTest(TestCase):
 
         item = Item(text='Some Text')
         self.assertEqual(str(item), 'Some Text')
+
+
+class ListModelTest(TestCase):
+    """ Test Item model related operations """
+
+    def test_get_absolute_url(self):
+        """ test as the name suggest """
+
+        list_ = List.objects.create()
+        self.assertEqual(list_.get_absolute_url(), '/lists/%d/' % list_.id)

@@ -1,5 +1,7 @@
 """ lists app unit test. """
 
+from unittest import skip
+
 from django.test import TestCase
 from django.utils.html import escape
 
@@ -136,6 +138,20 @@ class ListViewTest(TestCase):
         response = self.post_invalid_input()
 
         self.assertContains(response, escape(EMPTY_LIST_ERROR))
+
+    @skip
+    def test_duplicate_item_validation_errors_end_up_on_lists_page(self):
+        """ test as the name suggest """
+
+        list1 = List.objects.create()
+        Item.objects.create(list=list1, text='textey')
+        response = self.client.post('/lists/%d/' % list1.id,
+                                    data={'text': 'textey'})
+
+        expected_error = escape('You\'ve already got this in your list')
+        self.assertContains(response, expected_error)
+        self.assertTemplateUsed(response, 'list.html')
+        self.assertEqual(Item.objects.all().count(), 1)
 
 
 class NewListTest(TestCase):
