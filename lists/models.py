@@ -18,3 +18,14 @@ class Item(models.Model):
 
     text = models.TextField()
     list = models.ForeignKey(List)
+
+    class Meta:
+        """ List item model metaclass """
+
+        ordering = ('id', )
+        unique_together = ('text', 'list')
+
+    def __str__(self):
+        """ return string representation of the instance """
+
+        return self.text

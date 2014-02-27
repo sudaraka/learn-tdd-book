@@ -47,3 +47,41 @@ class ListAndItemModelTest(TestCase):
 
         list_ = List.objects.create()
         self.assertEqual(list_.get_absolute_url(), '/lists/%d/' % list_.id)
+
+    def test_duplicate_items_are_invalid(self):
+        """
+        adding duplicate items to the list must be prevented at model level
+
+        """
+
+        list_ = List.objects.create()
+        Item.objects.create(text='SAME', list=list_)
+
+        with self.assertRaises(ValidationError):
+            item = Item(text='SAME', list=list_)
+            item.full_clean()
+
+    def test_can_save_same_item_in_different_lists(self):
+        """ test as the name suggests """
+
+        list_1 = List.objects.create()
+        Item.objects.create(text='SAME', list=list_1)
+        list_2 = List.objects.create()
+        item = Item.objects.create(text='SAME', list=list_2)
+        item.full_clean()
+
+    def test_list_ordering(self):
+        """ test as name suggest """
+
+        list_ = List.objects.create()
+        i1 = Item.objects.create(list=list_, text='i1')
+        i2 = Item.objects.create(list=list_, text='item 2')
+        i3 = Item.objects.create(list=list_, text='3')
+
+        self.assertEqual(list(Item.objects.all()), [i1, i2, i3])
+
+    def test_string_representation(self):
+        """ test as name suggest """
+
+        item = Item(text='Some Text')
+        self.assertEqual(str(item), 'Some Text')
