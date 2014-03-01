@@ -83,5 +83,9 @@ def _update_static_files(source_dir):
 def _update_databse(source_dir):
     """ synchronize database """
 
-    run('cd %s && ../virtualenv/bin/python3 manage.py syncdb --noinput' %
-        source_dir)
+    run('cd %s && ../virtualenv/bin/python3 manage.py syncdb' % source_dir)
+
+    run('cd %s && ../virtualenv/bin/python3 manage.py migrate lists\
+        --fake 0001' % source_dir)
+
+    run('cd %s && ../virtualenv/bin/python3 manage.py migrate' % source_dir)
